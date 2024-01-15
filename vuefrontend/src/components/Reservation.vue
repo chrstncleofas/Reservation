@@ -44,7 +44,7 @@
             </thead>
             <tbody>
                 <!-- eslint-disable -->
-                <tr v-for="item in reservations" :key="item.userID">
+                <tr v-for="(item, index) in reservations" :key="index">
                     <td>{{ item.userID }}</td>
                     <td>{{ item.fname }}</td>
                     <td>{{ item.lname }}</td>
@@ -56,7 +56,8 @@
                             @click="info(item)">
                             <i class="fa-solid fa-circle-info fa-lg"></i>
                         </button>
-                        <div class="modal fade" id="exampleModalInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" ref="modalPopup">
+                        <div class="modal fade" id="exampleModalInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+                            ref="modalPopup">
                             <div class="modal-dialog modal-m modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -92,7 +93,7 @@
                 </tr>
             </tbody>
         </table>
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" ref="modalPopup">
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-m modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -120,10 +121,10 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="button" @click="createClick()" v-if="userID == 0" class="btn btn-success">
+                        <button type="button" @click="createClick()" v-if="userID == 0" class="btn btn-success" data-bs-dismiss="modal">
                             Create
                         </button>
-                        <button type="button" @click="updateClick()" v-if="userID != 0" class="btn btn-primary">
+                        <button type="button" @click="updateClick()" v-if="userID != 0" class="btn btn-primary" data-bs-dismiss="modal">
                             Update
                         </button>
                     </div>
@@ -134,95 +135,125 @@
 </template>
 
 <script>
-import axios from 'axios';
-const variables = {
-    API_URL: "http://127.0.0.1:8000/"
-};
+    import { ref, onMounted } from 'vue';
+    import axios from 'axios';
 
-export default {
+    const variables = {
+        API_URL: "http://127.0.0.1:8000/"
+    };
+
+    export default {
     /* eslint-disable */
-    name: 'Reservation',
-    data() {
-        return {
-            reservations: [],
-            modalTitle: "",
-            userID: 0,
-            fname: "",
-            lname: "",
-            email: "",
-            phone: "",
-        }
-    },
-    methods: {
-        refreshData() {
-            axios.get(variables.API_URL + "reservation")
-                .then((response) => {
-                    this.reservations = response.data;
-                });
-        },
-        addClick() {
-            this.modalTitle = "Add Page";
-            this.userID = 0;
-            this.fname = "";
-            this.lname = "";
-            this.email = "";
-            this.phone = "";
-        },
-        editClick(item) {
-            this.modalTitle = "Edit Page";
-            this.userID = item.userID;
-            this.fname = item.fname;
-            this.lname = item.lname;
-            this.email = item.email;
-            this.phone = item.phone;
-        },
-        createClick() {
-            axios.post(variables.API_URL + "reservation", {
-                fname: this.fname,
-                lname: this.lname,
-                email: this.email,
-                phone: this.phone
-            })
-                .then((response) => {
-                    this.refreshData();
-                    alert(response.data);
-                });
-        },
-        updateClick() {
-            axios.put(variables.API_URL + "reservation", {
-                userID: this.userID,
-                fname: this.fname,
-                lname: this.lname,
-                email: this.email,
-                phone: this.phone
-            })
-                .then((response) => {
-                    this.refreshData();
-                    alert(response.data);
-                });
-        },
-        deleteClick(id) {
-            if (!confirm("Are you sure?")) {
-                return;
-            }
-            axios.delete(variables.API_URL + "reservation/" + id)
-                .then((response) => {
-                    this.refreshData();
-                    alert(response.data);
-                });
+        name: 'Reservation',
+        setup() {
+            const reservations = ref([]);
+            const modalTitle = ref("");
+            const userID = ref(0);
+            const fname = ref("");
+            const lname = ref("");
+            const email = ref("");
+            const phone = ref("");
 
-        },
-        info(item) {
-            this.modalTitle = "Information";
-            this.userID = item.userID;
-            this.fname = item.fname;
-            this.lname = item.lname;
-            this.email = item.email;
-            this.phone = item.phone;
-        },
-    },
-    mounted: function () {
-        this.refreshData();
-    }
-}
+            const refreshData = () => {
+                axios.get(`${variables.API_URL}reservation`)
+                    .then(response => {
+                    reservations.value = response.data;
+                    });
+            };
+
+            onMounted(() => {
+                refreshData();
+            });
+
+            const addClick = () => {
+                modalTitle.value = "Add Page";
+                userID.value = 0;
+                fname.value = "";
+                lname.value = "";
+                email.value = "";
+                phone.value = "";
+            };
+
+            const editClick = (item) => {
+                modalTitle.value = "Edit Page";
+                userID.value = item.userID;
+                fname.value = item.fname;
+                lname.value = item.lname;
+                email.value = item.email;
+                phone.value = item.phone;
+            };
+
+            const createClick = () => {
+                axios.post(`${variables.API_URL}reservation`, {
+                    fname: fname.value,
+                    lname: lname.value,
+                    email: email.value,
+                    phone: phone.value
+                })
+                .then(response => {
+                    refreshData();
+                    alert(response.data);
+                });
+            };
+
+            const updateClick = () => {
+                axios.put(`${variables.API_URL}reservation/${userID.value}`, {
+                    userID: userID.value,
+                    fname: fname.value,
+                    lname: lname.value,
+                    email: email.value,
+                    phone: phone.value
+                })
+                .then(response => {
+                    const updatedIndex = reservations.value.findIndex(item => item.userID === userID.value);
+                    if (updatedIndex !== -1) {
+                    Object.assign(reservations.value[updatedIndex], response.data);
+                    }
+
+                    alert('Update successful');
+                })
+                .catch(error => {
+                    console.error('Error updating data:', error);
+                    alert('Failed to update data');
+                });
+            };
+
+            const deleteClick = (id) => {
+                if (!confirm("Are you sure?")) {
+                    return;
+                }
+                axios.delete(`${variables.API_URL}reservation/${id}`)
+                    .then(response => {
+                    refreshData();
+                    alert(response.data);
+                    });
+                };
+
+                const info = (item) => {
+                modalTitle.value = "Information";
+                userID.value = item.userID;
+                fname.value = item.fname;
+                lname.value = item.lname;
+                email.value = item.email;
+                phone.value = item.phone;
+                };
+
+            return {
+                reservations,
+                modalTitle,
+                userID,
+                fname,
+                lname,
+                email,
+                phone,
+                refreshData,
+                addClick,
+                editClick,
+                createClick,
+                updateClick,
+                deleteClick,
+                info
+            };
+        }
+    };
 </script>

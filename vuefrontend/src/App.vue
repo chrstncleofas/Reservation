@@ -5,11 +5,11 @@
 </template>
 
 <script>
-import Reservation from './components/Reservation'
-export default {
-  name: 'App',
-  components: {
-    Reservation,
+  import Reservation from './components/Reservation'
+  export default {
+    name: 'App',
+    components: {
+      Reservation,
+    }
   }
-}
 </script>

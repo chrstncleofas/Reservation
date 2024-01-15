@@ -6,20 +6,20 @@ from app.serializers import ReservationSerializer
 
 @csrf_exempt
 def reservationApi(request, id=0):
-    # Fetch all Data Api
+    # Fetch all Data API
     if request.method=='GET':
         reservations = Reservation.objects.all()
         reservation_serializer=ReservationSerializer(reservations, many=True)
         return JsonResponse(reservation_serializer.data, safe=False)
-    # Create or Add Api
+    # Create or Add API
     elif request.method=='POST':
         reservation_data=JSONParser().parse(request)
         reservation_serializer=ReservationSerializer(data=reservation_data)
         if reservation_serializer.is_valid():
             reservation_serializer.save()
-            return JsonResponse("Added Successfully",safe=False)
+            return JsonResponse("Added Successfully", safe=False)
         return JsonResponse("Failed to Add",safe=False)
-    # Update Api
+    # Update API
     elif request.method=='PUT':
         reservation_data=JSONParser().parse(request)
         reservation=Reservation.objects.get(userID=reservation_data['userID'])
@@ -28,8 +28,8 @@ def reservationApi(request, id=0):
             reservations_serializer.save()
             return JsonResponse("Updated Successfully", safe=False)
         return JsonResponse("Failed to Update")
-    # Delete Api
+    # Delete API
     elif request.method=='DELETE':
         reservation=Reservation.objects.get(userID=id)
         reservation.delete()
-        return JsonResponse("Deleted Successfully",safe=False)
+        return JsonResponse("Deleted Successfully", safe=False)
