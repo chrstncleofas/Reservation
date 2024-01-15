@@ -207,7 +207,7 @@
                 .then(response => {
                     const updatedIndex = reservations.value.findIndex(item => item.userID === userID.value);
                     if (updatedIndex !== -1) {
-                    Object.assign(reservations.value[updatedIndex], response.data);
+                        Object.assign(reservations.value[updatedIndex], response.data);
                     }
 
                     alert('Update successful');
