@@ -7,3 +7,5 @@ class Reservation(models.Model):
     email = models.CharField(max_length=50)
     phone = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ['userID']
